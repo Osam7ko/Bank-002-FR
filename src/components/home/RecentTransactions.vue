@@ -98,12 +98,20 @@
           </div>
         </div>
         <div class="text-right">
-          <p
-            class="text-sm font-semibold"
-            :class="getAmountColor(transaction.transactionType)"
-          >
-            {{ formatAmount(transaction.amount, transaction.transactionType) }}
-          </p>
+          <div class="flex items-center justify-end space-x-1">
+            <SarIcon
+              size="w-3 h-3"
+              :class="getAmountColor(transaction.transactionType)"
+            />
+            <p
+              class="text-sm font-semibold"
+              :class="getAmountColor(transaction.transactionType)"
+            >
+              {{
+                formatAmount(transaction.amount, transaction.transactionType)
+              }}
+            </p>
+          </div>
           <p class="text-xs text-gray-500 capitalize">
             {{ transaction.transactionType }}
           </p>
@@ -115,6 +123,7 @@
 
 <script setup>
 import { computed } from "vue";
+import SarIcon from "@/components/icons/SarIcon.vue";
 
 const props = defineProps({
   transactions: {
@@ -134,9 +143,10 @@ const props = defineProps({
 defineEmits(["retry"]);
 
 const formatAmount = (amount, type) => {
-  const formattedAmount = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
+  const formattedAmount = new Intl.NumberFormat("ar-SA", {
+    style: "decimal",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(Math.abs(amount));
 
   if (type?.toLowerCase() === "credit") {

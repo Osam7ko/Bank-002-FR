@@ -49,6 +49,9 @@ export const userAPI = {
   // Login
   login: (loginDto) => api.post("/api/user/login", loginDto),
 
+  // Update profile
+  updateProfile: (updateRequest) => api.put("/api/user/profile", updateRequest),
+
   // Balance enquiry
   balanceEnquiry: (enquiryRequest) =>
     api.post("/api/user/balanceEnquiry", enquiryRequest),
