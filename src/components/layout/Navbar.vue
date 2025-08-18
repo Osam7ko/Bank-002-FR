@@ -18,14 +18,14 @@
               'text-primary-600 bg-primary-50': $route.name === 'Dashboard',
             }"
           >
-            Dashboard
+            {{ $t("navigation.dashboard") }}
           </router-link>
 
           <div class="relative group">
             <button
               class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center"
             >
-              Transactions
+              {{ $t("navigation.transactions") }}
               <svg
                 class="ml-1 h-4 w-4"
                 fill="none"
@@ -47,19 +47,19 @@
                 to="/transfer"
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600"
               >
-                Transfer
+                {{ $t("navigation.transfer") }}
               </router-link>
               <router-link
                 to="/credit"
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600"
               >
-                Credit
+                {{ $t("navigation.credit") }}
               </router-link>
               <router-link
                 to="/debit"
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600"
               >
-                Debit
+                {{ $t("navigation.debit") }}
               </router-link>
             </div>
           </div>
@@ -71,7 +71,7 @@
               'text-primary-600 bg-primary-50': $route.name === 'Beneficiaries',
             }"
           >
-            Beneficiaries
+            {{ $t("navigation.beneficiaries") }}
           </router-link>
 
           <router-link
@@ -81,12 +81,25 @@
               'text-primary-600 bg-primary-50': $route.name === 'Statement',
             }"
           >
-            Statement
+            {{ $t("navigation.statement") }}
+          </router-link>
+
+          <router-link
+            to="/cards"
+            class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            :class="{
+              'text-primary-600 bg-primary-50': $route.name === 'Cards',
+            }"
+          >
+            {{ $t("navigation.cards") }}
           </router-link>
         </div>
 
-        <!-- User Menu -->
+        <!-- User Menu and Language Switcher -->
         <div class="flex items-center space-x-4">
+          <!-- Language Switcher -->
+          <LanguageSwitcher />
+
           <div class="relative group">
             <button
               class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
@@ -118,13 +131,13 @@
                 to="/profile"
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600"
               >
-                Profile
+                {{ $t("navigation.profile") }}
               </router-link>
               <button
                 @click="handleLogout"
                 class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600"
               >
-                Logout
+                {{ $t("navigation.logout") }}
               </button>
             </div>
           </div>
@@ -172,55 +185,62 @@
           class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50"
           @click="mobileMenuOpen = false"
         >
-          Dashboard
+          {{ $t("navigation.dashboard") }}
         </router-link>
         <router-link
           to="/transfer"
           class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50"
           @click="mobileMenuOpen = false"
         >
-          Transfer
+          {{ $t("navigation.transfer") }}
         </router-link>
         <router-link
           to="/credit"
           class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50"
           @click="mobileMenuOpen = false"
         >
-          Credit
+          {{ $t("navigation.credit") }}
         </router-link>
         <router-link
           to="/debit"
           class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50"
           @click="mobileMenuOpen = false"
         >
-          Debit
+          {{ $t("navigation.debit") }}
         </router-link>
         <router-link
           to="/beneficiaries"
           class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50"
           @click="mobileMenuOpen = false"
         >
-          Beneficiaries
+          {{ $t("navigation.beneficiaries") }}
         </router-link>
         <router-link
           to="/statement"
           class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50"
           @click="mobileMenuOpen = false"
         >
-          Statement
+          {{ $t("navigation.statement") }}
+        </router-link>
+        <router-link
+          to="/cards"
+          class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50"
+          @click="mobileMenuOpen = false"
+        >
+          {{ $t("navigation.cards") }}
         </router-link>
         <router-link
           to="/profile"
           class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50"
           @click="mobileMenuOpen = false"
         >
-          Profile
+          {{ $t("navigation.profile") }}
         </router-link>
         <button
           @click="handleLogout"
           class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-red-600 hover:bg-red-50"
         >
-          Logout
+          {{ $t("navigation.logout") }}
         </button>
       </div>
     </div>
@@ -230,8 +250,11 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useAuth } from "@/composables/useAuth";
+import { useI18n } from "vue-i18n";
+import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
 
 const { user, logout } = useAuth();
+const { t } = useI18n();
 const mobileMenuOpen = ref(false);
 
 const userName = computed(() => {
@@ -239,7 +262,7 @@ const userName = computed(() => {
     user.value?.accountName ||
     user.value?.firstName ||
     user.value?.name ||
-    "User"
+    t("messages.user")
   );
 });
 

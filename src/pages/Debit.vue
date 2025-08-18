@@ -3,15 +3,19 @@
     <div class="max-w-2xl mx-auto space-y-6">
       <!-- Header -->
       <div class="text-center">
-        <h1 class="text-3xl font-bold text-gray-900">Debit Account</h1>
-        <p class="mt-2 text-gray-600">Withdraw funds from an account</p>
+        <h1 class="text-3xl font-bold text-gray-900">
+          {{ $t("debit.debitAccount") }}
+        </h1>
+        <p class="mt-2 text-gray-600">{{ $t("debit.withdrawFromAccount") }}</p>
       </div>
 
       <!-- Debit Form -->
       <div class="card">
         <form @submit.prevent="handleDebit" class="space-y-6">
           <div>
-            <label for="accountNumber" class="form-label">Account Number</label>
+            <label for="accountNumber" class="form-label">{{
+              $t("forms.accountNumber")
+            }}</label>
             <input
               id="accountNumber"
               v-model="form.accountNumber"
@@ -19,10 +23,10 @@
               required
               readonly
               class="input-field bg-gray-50 cursor-not-allowed"
-              placeholder="Your account number"
+              :placeholder="$t('placeholders.yourAccountNumber')"
             />
             <p class="text-sm text-gray-500 mt-1">
-              This is your account number (locked)
+              {{ $t("transfer.thisIsYourAccount") }}
             </p>
           </div>
 
@@ -49,19 +53,21 @@
               </div>
               <div class="ml-3">
                 <p class="text-sm font-medium text-green-800">
-                  Account Name: {{ accountName }}
+                  {{ $t("credit.accountName") }}: {{ accountName }}
                 </p>
               </div>
             </div>
           </div>
 
           <div>
-            <label for="amount" class="form-label">Amount</label>
+            <label for="amount" class="form-label">{{
+              $t("forms.amount")
+            }}</label>
             <div class="relative">
               <div
                 class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
               >
-                <span class="text-gray-500 sm:text-sm">$</span>
+                <SarIcon size="w-4 h-4 text-gray-500" />
               </div>
               <input
                 id="amount"
@@ -71,21 +77,21 @@
                 min="0.01"
                 required
                 class="input-field pl-7"
-                placeholder="0.00"
+                :placeholder="$t('placeholders.amountPlaceholder')"
               />
             </div>
           </div>
 
           <div>
-            <label for="description" class="form-label"
-              >Description (Optional)</label
-            >
+            <label for="description" class="form-label">{{
+              $t("forms.description")
+            }}</label>
             <textarea
               id="description"
               v-model="form.description"
               rows="3"
               class="input-field"
-              placeholder="Debit description"
+              :placeholder="$t('placeholders.debitDescription')"
             ></textarea>
           </div>
 
@@ -107,8 +113,7 @@
               </div>
               <div class="ml-3">
                 <h3 class="text-sm font-medium text-yellow-800">
-                  Please ensure sufficient balance before proceeding with the
-                  debit transaction.
+                  {{ $t("debit.sufficientBalanceWarning") }}
                 </h3>
               </div>
             </div>
@@ -144,9 +149,12 @@
               <div
                 class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"
               ></div>
-              Processing Debit...
+              {{ $t("debit.processingDebit") }}
             </span>
-            <span v-else>Debit {{ formatCurrency(form.amount) }}</span>
+            <span v-else
+              >{{ $t("navigation.debit") }}
+              {{ formatCurrency(form.amount) }}</span
+            >
           </button>
         </form>
       </div>
@@ -158,14 +166,18 @@
       >
         <div class="flex items-center justify-between">
           <div>
-            <h3 class="text-lg font-medium text-blue-800">Quick Debit</h3>
-            <p class="text-sm text-blue-600">Debit from your own account</p>
+            <h3 class="text-lg font-medium text-blue-800">
+              {{ $t("debit.quickDebit") }}
+            </h3>
+            <p class="text-sm text-blue-600">
+              {{ $t("debit.debitYourAccount") }}
+            </p>
           </div>
           <button
             @click="useMyAccount"
             class="btn-primary bg-blue-600 hover:bg-blue-700"
           >
-            Use My Account
+            {{ $t("credit.useMyAccount") }}
           </button>
         </div>
       </div>
@@ -197,12 +209,15 @@
               </svg>
             </div>
             <h3 class="text-lg leading-6 font-medium text-gray-900 mt-4">
-              Debit Successful!
+              {{ $t("debit.debitSuccessful") }}
             </h3>
             <div class="mt-2 px-7 py-3">
               <p class="text-sm text-gray-500">
-                The account has been debited with
-                {{ formatCurrency(form.amount) }} successfully.
+                {{
+                  $t("debit.accountDebited", {
+                    amount: formatCurrency(form.amount),
+                  })
+                }}
               </p>
             </div>
             <div class="items-center px-4 py-3">
@@ -210,7 +225,7 @@
                 @click="resetForm"
                 class="px-4 py-2 bg-green-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-green-600"
               >
-                Make Another Debit
+                {{ $t("debit.makeAnotherDebit") }}
               </button>
             </div>
           </div>
@@ -223,6 +238,7 @@
 <script setup>
 import { reactive, ref, onMounted } from "vue";
 import Layout from "@/components/layout/Layout.vue";
+import SarIcon from "@/components/icons/SarIcon.vue";
 import { useTransfer } from "@/composables/useTransfer";
 import { useBalance } from "@/composables/useBalance";
 import { useAuth } from "@/composables/useAuth";
@@ -250,6 +266,7 @@ const handleDebit = async () => {
   });
 
   if (result.success) {
+    clearError(); // Clear any lingering error messages
     debitSuccess.value = true;
   }
 };
@@ -284,10 +301,11 @@ const resetForm = () => {
 };
 
 const formatCurrency = (amount) => {
-  if (!amount) return "$0.00";
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
+  if (!amount) return "0.00";
+  return new Intl.NumberFormat("ar-SA", {
+    style: "decimal",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(amount);
 };
 

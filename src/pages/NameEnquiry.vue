@@ -164,7 +164,8 @@ const handleSaveBeneficiary = async () => {
 
     const result = await saveBeneficiary({
       accountNumber: form.accountNumber,
-      accountName: nameResult.value,
+      beneficiaryName: nameResult.value,
+      bankName: "001 Bank",
     });
 
     if (result.success) {

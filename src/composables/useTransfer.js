@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import { userAPI, beneficiaryAPI } from "@/services/api";
+import { accountAPI, transferAPI, beneficiaryAPI_v2 } from "@/services/api";
 
 export function useTransfer() {
   const isLoading = ref(false);
@@ -12,12 +12,16 @@ export function useTransfer() {
       isLoading.value = true;
       error.value = null;
 
-      const response = await userAPI.transfer(transferData);
+      // POST /api/transfers with optional Idempotency-Key header
+      const response = await transferAPI.transfer(
+        transferData,
+        transferData?.idempotencyKey
+      );
 
-      if (response.data.responseCode === "002") {
+      if (response?.data?.responseCode === "TRF-00") {
         return { success: true, data: response.data };
       } else {
-        throw new Error(response.data.responseMessage || "Transfer failed");
+        throw new Error(response?.data?.responseMessage || "Transfer failed");
       }
     } catch (err) {
       error.value =
@@ -34,12 +38,16 @@ export function useTransfer() {
       isLoading.value = true;
       error.value = null;
 
-      const response = await userAPI.credit(creditData);
+      // POST /api/accounts/{accountNumber}/credit?amount=...
+      const response = await accountAPI.credit(
+        creditData?.accountNumber,
+        creditData?.amount
+      );
 
-      if (response.data.responseCode === "002") {
+      if (response?.data?.responseCode === "00") {
         return { success: true, data: response.data };
       } else {
-        throw new Error(response.data.responseMessage || "Credit failed");
+        throw new Error(response?.data?.responseMessage || "Credit failed");
       }
     } catch (err) {
       error.value =
@@ -56,12 +64,16 @@ export function useTransfer() {
       isLoading.value = true;
       error.value = null;
 
-      const response = await userAPI.debit(debitData);
+      // POST /api/accounts/{accountNumber}/debit?amount=...
+      const response = await accountAPI.debit(
+        debitData?.accountNumber,
+        debitData?.amount
+      );
 
-      if (response.data.responseCode === "002") {
+      if (response?.data?.responseCode === "00") {
         return { success: true, data: response.data };
       } else {
-        throw new Error(response.data.responseMessage || "Debit failed");
+        throw new Error(response?.data?.responseMessage || "Debit failed");
       }
     } catch (err) {
       error.value =
@@ -78,7 +90,7 @@ export function useTransfer() {
       isLoading.value = true;
       error.value = null;
 
-      const response = await beneficiaryAPI.getAll();
+      const response = await beneficiaryAPI_v2.getAll();
       beneficiaries.value = response.data;
 
       return { success: true, data: response.data };
@@ -93,25 +105,30 @@ export function useTransfer() {
     }
   };
 
-  // Save beneficiary
+  // Save beneficiary (align with BK SaveBeneficiaryRequest)
+  // SaveBeneficiaryRequest { accountNumber, beneficiaryName, bankName }
   const saveBeneficiary = async (beneficiaryData) => {
     try {
       isLoading.value = true;
       error.value = null;
 
-      const response = await beneficiaryAPI.save(beneficiaryData);
+      const payload = {
+        accountNumber: beneficiaryData?.accountNumber,
+        beneficiaryName:
+          beneficiaryData?.beneficiaryName ||
+          beneficiaryData?.accountName ||
+          "",
+        bankName: beneficiaryData?.bankName || "001 Bank",
+      };
 
-      if (response.data.responseCode === "002") {
-        // Refresh beneficiaries list
-        await getBeneficiaries();
-        return { success: true, data: response.data };
-      } else {
-        throw new Error(
-          response.data.responseMessage || "Failed to save beneficiary"
-        );
-      }
+      const response = await beneficiaryAPI_v2.save(payload);
+
+      // Treat 200 OK with SavedBeneficiaryDto as success
+      await getBeneficiaries();
+      return { success: true, data: response.data };
     } catch (err) {
       error.value =
+        err.response?.data?.message ||
         err.response?.data?.responseMessage ||
         err.message ||
         "Failed to save beneficiary";
@@ -122,12 +139,12 @@ export function useTransfer() {
   };
 
   // Delete beneficiary
-  const deleteBeneficiary = async (id) => {
+  const deleteBeneficiary = async (accountNumber) => {
     try {
       isLoading.value = true;
       error.value = null;
 
-      await beneficiaryAPI.delete(id);
+      await beneficiaryAPI_v2.deleteByAccountNumber(accountNumber);
 
       // Refresh beneficiaries list
       await getBeneficiaries();

@@ -3,21 +3,25 @@
     <div class="max-w-2xl mx-auto space-y-6">
       <!-- Header -->
       <div class="text-center">
-        <h1 class="text-3xl font-bold text-gray-900">Bank Statement</h1>
+        <h1 class="text-3xl font-bold text-gray-900">
+          {{ $t("statement.bankStatement") }}
+        </h1>
         <p class="mt-2 text-gray-600">
-          Generate and receive your statement via email
+          {{ $t("statement.generateReceiveStatement") }}
         </p>
       </div>
 
       <!-- Statement Form -->
       <div class="card">
         <h2 class="text-xl font-semibold text-gray-900 mb-6">
-          Request Statement
+          {{ $t("statement.requestStatement") }}
         </h2>
 
         <form @submit.prevent="handleGenerateStatement" class="space-y-6">
           <div>
-            <label for="accountNumber" class="form-label">Account Number</label>
+            <label for="accountNumber" class="form-label">{{
+              $t("forms.accountNumber")
+            }}</label>
             <input
               id="accountNumber"
               v-model="form.accountNumber"
@@ -25,16 +29,18 @@
               required
               readonly
               class="input-field bg-gray-50 cursor-not-allowed"
-              placeholder="Your account number"
+              :placeholder="$t('placeholders.yourAccountNumber')"
             />
             <p class="text-sm text-gray-500 mt-1">
-              This is your account number (locked)
+              {{ $t("transfer.thisIsYourAccount") }}
             </p>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label for="startDate" class="form-label">Start Date</label>
+              <label for="startDate" class="form-label">{{
+                $t("forms.startDate")
+              }}</label>
               <input
                 id="startDate"
                 v-model="form.startDate"
@@ -45,7 +51,9 @@
             </div>
 
             <div>
-              <label for="endDate" class="form-label">End Date</label>
+              <label for="endDate" class="form-label">{{
+                $t("forms.endDate")
+              }}</label>
               <input
                 id="endDate"
                 v-model="form.endDate"
@@ -63,21 +71,21 @@
               @click="setDateRange('week')"
               class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
             >
-              Last 7 Days
+              {{ $t("statement.last7Days") }}
             </button>
             <button
               type="button"
               @click="setDateRange('month')"
               class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
             >
-              Last 30 Days
+              {{ $t("statement.last30Days") }}
             </button>
             <button
               type="button"
               @click="setDateRange('quarter')"
               class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
             >
-              Last 3 Months
+              {{ $t("statement.last3Months") }}
             </button>
           </div>
 
@@ -111,9 +119,9 @@
               <div
                 class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"
               ></div>
-              Generating Statement...
+              {{ $t("statement.generatingStatement") }}
             </span>
-            <span v-else>Generate Statement</span>
+            <span v-else>{{ $t("statement.generateStatement") }}</span>
           </button>
         </form>
       </div>
@@ -138,7 +146,7 @@
           </div>
           <div>
             <h3 class="text-lg font-medium text-blue-800 mb-2">
-              How Statement Generation Works
+              {{ $t("statement.howStatementWorks") }}
             </h3>
             <ul class="text-sm text-blue-700 space-y-2">
               <li class="flex items-start">
@@ -155,7 +163,7 @@
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                Your statement will be generated as a PDF document
+                {{ $t("statement.statementAsPDF") }}
               </li>
               <li class="flex items-start">
                 <svg
@@ -171,8 +179,7 @@
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                The PDF will be automatically sent to your registered email
-                address
+                {{ $t("statement.sentToEmail") }}
               </li>
               <li class="flex items-start">
                 <svg
@@ -188,8 +195,7 @@
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                The statement includes all transactions within the selected date
-                range
+                {{ $t("statement.includesAllTransactions") }}
               </li>
               <li class="flex items-start">
                 <svg
@@ -205,8 +211,7 @@
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                Please check your email (including spam folder) for the
-                statement
+                {{ $t("statement.checkEmailSpam") }}
               </li>
             </ul>
           </div>
@@ -220,16 +225,18 @@
       >
         <div class="flex items-center justify-between">
           <div>
-            <h3 class="text-lg font-medium text-green-800">Quick Statement</h3>
+            <h3 class="text-lg font-medium text-green-800">
+              {{ $t("statement.quickStatement") }}
+            </h3>
             <p class="text-sm text-green-600">
-              Generate statement for your account
+              {{ $t("statement.generateForYourAccount") }}
             </p>
           </div>
           <button
             @click="useMyAccount"
             class="btn-primary bg-green-600 hover:bg-green-700"
           >
-            Use My Account
+            {{ $t("statement.useMyAccount") }}
           </button>
         </div>
       </div>
@@ -261,19 +268,19 @@
           </div>
           <div class="flex-1">
             <h3 class="text-lg font-semibold text-green-800">
-              Statement Generated Successfully!
+              {{ $t("statement.statementGeneratedSuccessfully") }}
             </h3>
             <div class="mt-2 space-y-1">
               <p class="text-sm text-green-700">
-                Your bank statement has been generated and sent to your
-                registered email address.
+                {{ $t("statement.statementSentToEmail") }}
               </p>
               <p class="text-sm text-green-700">
-                <span class="font-medium">Period:</span> {{ form.startDate }} to
+                <span class="font-medium">{{ $t("statement.period") }}:</span>
+                {{ form.startDate }} to
                 {{ form.endDate }}
               </p>
               <p class="text-sm text-green-700">
-                <span class="font-medium">Account:</span>
+                <span class="font-medium">{{ $t("dashboard.account") }}:</span>
                 {{ form.accountNumber }}
               </p>
             </div>
@@ -281,7 +288,7 @@
               @click="statementSuccess = false"
               class="mt-3 text-sm text-green-600 hover:text-green-800 underline"
             >
-              Generate Another Statement
+              {{ $t("statement.generateAnotherStatement") }}
             </button>
           </div>
         </div>

@@ -4,26 +4,28 @@
       <!-- Header -->
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-3xl font-bold text-gray-900">Beneficiaries</h1>
+          <h1 class="text-3xl font-bold text-gray-900">
+            {{ $t("beneficiaries.manageBeneficiaries") }}
+          </h1>
           <p class="mt-2 text-gray-600">
-            Manage your saved transfer recipients
+            {{ $t("beneficiaries.savedRecipients") }}
           </p>
         </div>
         <button @click="showAddForm = true" class="btn-primary">
           <svg
-            class="h-5 w-5 mr-2"
+            class="h-1 w-1 mr-2"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path
+            <!-- <path
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
               d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            />
+            /> -->
           </svg>
-          Add Beneficiary
+          {{ $t("beneficiaries.addBeneficiary") }}
         </button>
       </div>
 
@@ -31,7 +33,7 @@
       <div v-if="showAddForm" class="card">
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-xl font-semibold text-gray-900">
-            Add New Beneficiary
+            {{ $t("beneficiaries.addNewBeneficiary") }}
           </h2>
           <button @click="cancelAdd" class="text-gray-400 hover:text-gray-600">
             <svg
@@ -53,9 +55,9 @@
         <form @submit.prevent="handleAddBeneficiary" class="space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label for="accountNumber" class="form-label"
-                >Account Number</label
-              >
+              <label for="accountNumber" class="form-label">{{
+                $t("forms.accountNumber")
+              }}</label>
               <div class="flex space-x-2">
                 <input
                   id="accountNumber"
@@ -63,7 +65,7 @@
                   type="text"
                   required
                   class="input-field flex-1"
-                  placeholder="Enter account number"
+                  :placeholder="$t('placeholders.enterAccountNumber')"
                 />
                 <button
                   type="button"
@@ -75,21 +77,23 @@
                     <div
                       class="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-600 mr-2"
                     ></div>
-                    Verifying...
+                    {{ $t("beneficiaries.verifying") }}
                   </span>
-                  <span v-else>Verify Account</span>
+                  <span v-else>{{ $t("beneficiaries.verifyAccount") }}</span>
                 </button>
               </div>
             </div>
             <div>
-              <label for="nickname" class="form-label">Nickname</label>
+              <label for="nickname" class="form-label">{{
+                $t("forms.nickname")
+              }}</label>
               <input
                 id="nickname"
                 v-model="addForm.nickname"
                 type="text"
                 required
                 class="input-field"
-                placeholder="Enter a nickname"
+                :placeholder="$t('placeholders.enterNickname')"
               />
             </div>
           </div>
@@ -102,7 +106,7 @@
             <div
               class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"
             ></div>
-            Verifying account...
+            {{ $t("beneficiaries.verifying") }}...
           </div>
 
           <div
@@ -124,7 +128,8 @@
                 />
               </svg>
               <span class="text-green-800">
-                <strong>Account verified:</strong> {{ verifiedAccountName }}
+                <strong>{{ $t("beneficiaries.verifyAccount") }}:</strong>
+                {{ verifiedAccountName }}
               </span>
             </div>
           </div>
@@ -168,16 +173,16 @@
                 <div
                   class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"
                 ></div>
-                Adding...
+                {{ $t("beneficiaries.adding") }}
               </span>
-              <span v-else>Add Beneficiary</span>
+              <span v-else>{{ $t("beneficiaries.addBeneficiary") }}</span>
             </button>
             <button
               type="button"
               @click="cancelAdd"
               class="btn-secondary flex-1"
             >
-              Cancel
+              {{ $t("buttons.cancel") }}
             </button>
           </div>
         </form>
@@ -186,14 +191,16 @@
       <!-- Beneficiaries List -->
       <div class="card">
         <h2 class="text-xl font-semibold text-gray-900 mb-6">
-          Saved Beneficiaries
+          {{ $t("transfer.savedBeneficiaries") }}
         </h2>
 
         <div v-if="isLoading" class="flex items-center justify-center py-8">
           <div
             class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"
           ></div>
-          <span class="ml-2 text-gray-600">Loading beneficiaries...</span>
+          <span class="ml-2 text-gray-600"
+            >{{ $t("messages.failedToLoadBeneficiaries") }}...</span
+          >
         </div>
 
         <div v-else-if="error" class="text-center py-8">
@@ -211,11 +218,11 @@
             />
           </svg>
           <h3 class="mt-4 text-lg font-medium text-gray-900">
-            Error loading beneficiaries
+            {{ $t("messages.failedToLoadBeneficiaries") }}
           </h3>
           <p class="mt-2 text-gray-500">{{ error }}</p>
           <button @click="loadBeneficiaries" class="mt-4 btn-primary">
-            Try Again
+            {{ $t("buttons.retry") }}
           </button>
         </div>
 
@@ -234,13 +241,13 @@
             />
           </svg>
           <h3 class="mt-4 text-lg font-medium text-gray-900">
-            No beneficiaries yet
+            {{ $t("beneficiaries.noBeneficiaries") }}
           </h3>
           <p class="mt-2 text-gray-500">
-            Add your first beneficiary to make transfers easier.
+            {{ $t("beneficiaries.startByAdding") }}
           </p>
           <button @click="showAddForm = true" class="mt-4 btn-primary">
-            Add Beneficiary
+            {{ $t("beneficiaries.addBeneficiary") }}
           </button>
         </div>
 
@@ -260,12 +267,12 @@
                     class="h-10 w-10 rounded-full bg-primary-600 flex items-center justify-center"
                   >
                     <span class="text-white font-medium">
-                      {{ getBeneficiaryInitials(beneficiary.name) }}
+                      {{ getBeneficiaryInitials(beneficiary.beneficiaryName) }}
                     </span>
                   </div>
                   <div class="ml-3">
                     <h3 class="text-lg font-medium text-gray-900">
-                      {{ beneficiary.name }}
+                      {{ beneficiary.beneficiaryName }}
                     </h3>
                     <p class="text-sm text-gray-500">
                       {{ beneficiary.accountNumber }}
@@ -280,13 +287,13 @@
                     }"
                     class="btn-primary text-sm"
                   >
-                    Transfer
+                    {{ $t("navigation.transfer") }}
                   </router-link>
                   <button
                     @click="deleteBeneficiary(beneficiary.accountNumber)"
                     class="btn-secondary text-sm text-red-600 hover:text-red-700"
                   >
-                    Delete
+                    {{ $t("buttons.delete") }}
                   </button>
                 </div>
               </div>
@@ -323,8 +330,11 @@
 
 <script setup>
 import { ref, reactive, onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 import Layout from "@/components/layout/Layout.vue";
-import { beneficiaryAPI, userAPI } from "@/services/api";
+import { beneficiaryAPI_v2, accountAPI } from "@/services/api";
+
+const { t } = useI18n();
 
 const beneficiaries = ref([]);
 const isLoading = ref(false);
@@ -347,10 +357,11 @@ const loadBeneficiaries = async () => {
     isLoading.value = true;
     error.value = null;
 
-    const response = await beneficiaryAPI.getAll();
+    const response = await beneficiaryAPI_v2.getAll();
     beneficiaries.value = response.data || [];
   } catch (err) {
-    error.value = err.response?.data?.message || "Failed to load beneficiaries";
+    error.value =
+      err.response?.data?.message || t("messages.failedToLoadBeneficiaries");
   } finally {
     isLoading.value = false;
   }
@@ -368,19 +379,18 @@ const verifyAccountNumber = async () => {
     verificationError.value = null;
     verifiedAccountName.value = null;
 
-    const response = await userAPI.nameEnquiry({
-      accountNumber: addForm.accountNumber,
-    });
+    const response = await accountAPI.nameEnquiry(addForm.accountNumber);
 
     // The response is directly the account name as a string
     if (response.data) {
       verifiedAccountName.value = response.data;
     } else {
-      verificationError.value = "Account not found";
+      verificationError.value = t("messages.accountNotFound");
     }
   } catch (err) {
     verificationError.value =
-      err.response?.data?.responseMessage || "Failed to verify account";
+      err.response?.data?.responseMessage ||
+      t("messages.failedToVerifyAccount");
   } finally {
     verificationLoading.value = false;
   }
@@ -392,13 +402,17 @@ const handleAddBeneficiary = async () => {
     addError.value = null;
 
     const beneficiaryData = {
-      name: addForm.nickname,
+      beneficiaryName: addForm.nickname,
       accountNumber: addForm.accountNumber,
     };
 
-    await beneficiaryAPI.save(beneficiaryData);
+    await beneficiaryAPI_v2.save({
+      beneficiaryName: beneficiaryData.beneficiaryName,
+      accountNumber: beneficiaryData.accountNumber,
+      bankName: "001 Bank",
+    });
 
-    successMessage.value = "Beneficiary added successfully!";
+    successMessage.value = t("messages.beneficiarySavedSuccessfully");
     setTimeout(() => {
       successMessage.value = null;
     }, 3000);
@@ -406,26 +420,32 @@ const handleAddBeneficiary = async () => {
     cancelAdd();
     loadBeneficiaries();
   } catch (err) {
-    addError.value = err.response?.data?.message || "Failed to add beneficiary";
+    addError.value =
+      err.response?.data?.message || t("messages.failedToAddBeneficiary");
   } finally {
     isAdding.value = false;
   }
 };
 
-const deleteBeneficiary = async (id) => {
-  if (!confirm("Are you sure you want to delete this beneficiary?")) {
+const deleteBeneficiary = async (accountNumber) => {
+  if (!confirm(t("beneficiaries.deleteBeneficiary") + "?")) {
     return;
   }
 
   try {
-    await beneficiaryAPI.delete(id);
-    successMessage.value = "Beneficiary deleted successfully!";
+    await beneficiaryAPI_v2.deleteByAccountNumber(accountNumber);
+    successMessage.value =
+      t("messages.failedToDeleteBeneficiary").replace(
+        "Failed to delete",
+        "Deleted"
+      ) + " successfully!";
     setTimeout(() => {
       successMessage.value = null;
     }, 3000);
     loadBeneficiaries();
   } catch (err) {
-    error.value = err.response?.data?.message || "Failed to delete beneficiary";
+    error.value =
+      err.response?.data?.message || t("messages.failedToDeleteBeneficiary");
   }
 };
 

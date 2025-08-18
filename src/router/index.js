@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { useAuth } from "@/composables/useAuth";
+import authService from "@/services/auth/authService";
 
 // Import pages
 import Login from "@/pages/Login.vue";
@@ -11,6 +11,7 @@ import Credit from "@/pages/Credit.vue";
 import Debit from "@/pages/Debit.vue";
 import Statement from "@/pages/Statement.vue";
 import UserInfo from "@/pages/UserInfo.vue";
+import Cards from "@/pages/Cards.vue";
 
 const routes = [
   {
@@ -66,6 +67,12 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: "/cards",
+    name: "Cards",
+    component: Cards,
+    meta: { requiresAuth: true },
+  },
+  {
     path: "/profile",
     name: "UserInfo",
     component: UserInfo,
@@ -82,20 +89,51 @@ const router = createRouter({
   routes,
 });
 
-// Navigation guards
-router.beforeEach((to, from, next) => {
-  const { isAuthenticated } = useAuth();
+/**
+ * Navigation guards
+ * - Require valid JWT for protected routes; try refresh once if expiring/expired.
+ * - Redirect authenticated users away from guest-only routes.
+ */
+router.beforeEach(async (to, from, next) => {
+  const requiresAuth = !!to.meta.requiresAuth;
+  const requiresGuest = !!to.meta.requiresGuest;
 
-  // Check if route requires authentication
-  if (to.meta.requiresAuth && !isAuthenticated.value) {
+  const access = authService.getAccessToken();
+  const refresh = authService.getRefreshToken();
+  const tokenValid = !!access && !authService.isTokenExpired(5); // small buffer
+
+  if (requiresAuth) {
+    if (tokenValid) {
+      next();
+      return;
+    }
+    if (refresh) {
+      try {
+        await authService.refreshWithLock();
+        next();
+        return;
+      } catch {
+        // fall through to login
+      }
+    }
     next("/login");
     return;
   }
 
-  // Check if route requires guest (not authenticated)
-  if (to.meta.requiresGuest && isAuthenticated.value) {
-    next("/dashboard");
-    return;
+  if (requiresGuest) {
+    if (tokenValid) {
+      next("/dashboard");
+      return;
+    }
+    if (refresh) {
+      try {
+        await authService.refreshWithLock();
+        next("/dashboard");
+        return;
+      } catch {
+        // allow guest route
+      }
+    }
   }
 
   next();

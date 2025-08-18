@@ -5,16 +5,20 @@
     <div class="max-w-md w-full space-y-8">
       <div>
         <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Create your account
+          {{ $t("auth.createAccount") }}
         </h2>
-        <p class="mt-2 text-center text-sm text-gray-600">Join BankApp today</p>
+        <p class="mt-2 text-center text-sm text-gray-600">
+          {{ $t("auth.joinBankAppToday") }}
+        </p>
       </div>
 
       <form class="mt-8 space-y-6" @submit.prevent="handleRegister">
         <div class="rounded-md shadow-sm space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label for="firstName" class="sr-only">First Name</label>
+              <label for="firstName" class="sr-only">{{
+                $t("auth.firstName")
+              }}</label>
               <input
                 id="firstName"
                 v-model="form.firstName"
@@ -22,11 +26,13 @@
                 type="text"
                 required
                 class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
-                placeholder="First Name"
+                :placeholder="$t('auth.firstName')"
               />
             </div>
             <div>
-              <label for="lastName" class="sr-only">Last Name</label>
+              <label for="lastName" class="sr-only">{{
+                $t("auth.lastName")
+              }}</label>
               <input
                 id="lastName"
                 v-model="form.lastName"
@@ -34,13 +40,29 @@
                 type="text"
                 required
                 class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
-                placeholder="Last Name"
+                :placeholder="$t('auth.lastName')"
               />
             </div>
           </div>
 
           <div>
-            <label for="email" class="sr-only">Email address</label>
+            <label for="otherName" class="sr-only">{{
+              $t("auth.otherName")
+            }}</label>
+            <input
+              id="otherName"
+              v-model="form.otherName"
+              name="otherName"
+              type="text"
+              class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
+              :placeholder="$t('auth.otherName')"
+            />
+          </div>
+
+          <div>
+            <label for="email" class="sr-only">{{
+              $t("auth.emailAddress")
+            }}</label>
             <input
               id="email"
               v-model="form.email"
@@ -49,12 +71,14 @@
               autocomplete="email"
               required
               class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
-              placeholder="Email address"
+              :placeholder="$t('auth.emailAddress')"
             />
           </div>
 
           <div>
-            <label for="password" class="sr-only">Password</label>
+            <label for="password" class="sr-only">{{
+              $t("auth.password")
+            }}</label>
             <input
               id="password"
               v-model="form.password"
@@ -63,12 +87,14 @@
               autocomplete="new-password"
               required
               class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
-              placeholder="Password"
+              :placeholder="$t('auth.password')"
             />
           </div>
 
           <div>
-            <label for="address" class="sr-only">Address</label>
+            <label for="address" class="sr-only">{{
+              $t("auth.address")
+            }}</label>
             <input
               id="address"
               v-model="form.address"
@@ -76,12 +102,29 @@
               type="text"
               required
               class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
-              placeholder="Address"
+              :placeholder="$t('auth.address')"
             />
           </div>
 
           <div>
-            <label for="phoneNumber" class="sr-only">Phone Number</label>
+            <label for="stateOfOrigin" class="sr-only">{{
+              $t("auth.stateOfOrigin")
+            }}</label>
+            <input
+              id="stateOfOrigin"
+              v-model="form.stateOfOrigin"
+              name="stateOfOrigin"
+              type="text"
+              required
+              class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
+              :placeholder="$t('auth.stateOfOrigin')"
+            />
+          </div>
+
+          <div>
+            <label for="phoneNumber" class="sr-only">{{
+              $t("auth.phoneNumber")
+            }}</label>
             <input
               id="phoneNumber"
               v-model="form.phoneNumber"
@@ -89,8 +132,39 @@
               type="tel"
               required
               class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
-              placeholder="Phone Number"
+              :placeholder="$t('auth.phoneNumber')"
             />
+          </div>
+
+          <div>
+            <label for="alternativePhoneNumber" class="sr-only">{{
+              $t("forms.alternativePhoneNumber")
+            }}</label>
+            <input
+              id="alternativePhoneNumber"
+              v-model="form.alternativePhoneNumber"
+              name="alternativePhoneNumber"
+              type="tel"
+              class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
+              :placeholder="$t('forms.alternativePhoneNumber')"
+            />
+          </div>
+
+          <div>
+            <label for="gender" class="sr-only">{{
+              $t("messages.gender")
+            }}</label>
+            <select
+              id="gender"
+              v-model="form.gender"
+              name="gender"
+              required
+              class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
+            >
+              <option value="">{{ $t("auth.selectGender") }}</option>
+              <option value="MALE">{{ $t("auth.male") }}</option>
+              <option value="FEMALE">{{ $t("auth.female") }}</option>
+            </select>
           </div>
         </div>
 
@@ -131,18 +205,20 @@
                 class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"
               ></div>
             </span>
-            {{ isLoading ? "Creating account..." : "Create account" }}
+            {{
+              isLoading ? $t("auth.creatingAccount") : $t("auth.createAccount")
+            }}
           </button>
         </div>
 
         <div class="text-center">
           <p class="text-sm text-gray-600">
-            Already have an account?
+            {{ $t("auth.alreadyHaveAccount") }}
             <router-link
               to="/login"
               class="font-medium text-primary-600 hover:text-primary-500"
             >
-              Sign in here
+              {{ $t("auth.signInHere") }}
             </router-link>
           </p>
         </div>
@@ -160,10 +236,14 @@ const { register, isLoading, error, clearError } = useAuth();
 const form = reactive({
   firstName: "",
   lastName: "",
+  otherName: "",
   email: "",
   password: "",
   address: "",
+  stateOfOrigin: "",
   phoneNumber: "",
+  alternativePhoneNumber: "",
+  gender: "",
 });
 
 const handleRegister = async () => {
@@ -172,17 +252,18 @@ const handleRegister = async () => {
   const result = await register({
     firstName: form.firstName,
     lastName: form.lastName,
+    otherName: form.otherName || "", // Ensure it's not null
     email: form.email,
     password: form.password,
     address: form.address,
+    stateOfOrigin: form.stateOfOrigin,
     phoneNumber: form.phoneNumber,
-    alternativePhoneNumber: "",
-    gender: "OTHERS",
+    alternativePhoneNumber: form.alternativePhoneNumber || "",
+    gender: form.gender || "OTHERS",
     status: "ACTIVE",
   });
 
   if (result.success) {
-    // Navigation is handled in the useAuth composable
     console.log("Registration successful");
   }
 };

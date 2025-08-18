@@ -4,10 +4,10 @@
       <!-- Welcome Section -->
       <div class="bg-white rounded-lg shadow-sm p-6">
         <h1 class="text-2xl font-bold text-gray-900">
-          Welcome back, {{ userName }}!
+          {{ $t("dashboard.welcomeBack", { name: userName }) }}
         </h1>
         <p class="text-gray-600 mt-1">
-          Here's an overview of your account activity
+          {{ $t("dashboard.accountOverview") }}
         </p>
       </div>
 
@@ -16,7 +16,7 @@
 
       <!-- Quick Actions -->
       <div>
-        <h2 class="section-title">Quick Actions</h2>
+        <h2 class="section-title">{{ $t("dashboard.quickActions") }}</h2>
         <QuickActions />
       </div>
 
@@ -33,6 +33,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
+import { useI18n } from "vue-i18n";
 import Layout from "@/components/layout/Layout.vue";
 import BalanceCard from "@/components/home/BalanceCard.vue";
 import QuickActions from "@/components/home/QuickActions.vue";
@@ -44,6 +45,7 @@ import { useTransactions } from "@/composables/useTransactions";
 const { user } = useAuth();
 const { balance, getBalance } = useBalance();
 const { getRecentTransactions } = useTransactions();
+const { t } = useI18n();
 
 const recentTransactions = ref([]);
 const transactionsLoading = ref(false);
@@ -54,7 +56,7 @@ const userName = computed(() => {
     user.value?.accountName ||
     user.value?.firstName ||
     user.value?.name ||
-    "User"
+    t("messages.user")
   );
 });
 
@@ -73,15 +75,24 @@ const loadAccountBalance = async () => {
 };
 
 const loadRecentTransactions = async () => {
-  // Remove automatic transaction loading to avoid statement generation
-  // Transactions will only be loaded when user explicitly requests them
-  recentTransactions.value = [];
-  transactionsLoading.value = false;
+  transactionsLoading.value = true;
   transactionsError.value = null;
+  try {
+    const { success, data, error } = await getRecentTransactions(
+      user.value.accountNumber
+    );
+    if (!success) throw new Error(error || "Failed to get recent transactions");
+    recentTransactions.value = data;
+  } catch (e) {
+    transactionsError.value = e.message;
+  } finally {
+    transactionsLoading.value = false;
+  }
 };
 
 onMounted(() => {
   // Only load balance, not transactions to avoid automatic statement generation
   loadAccountBalance();
+  loadRecentTransactions();
 });
 </script>

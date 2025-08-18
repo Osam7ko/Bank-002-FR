@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import { statementAPI } from "@/services/api";
+import { statementAPI, transactionAPI } from "@/services/api";
 
 export function useTransactions() {
   const transactions = ref([]);
@@ -7,19 +7,41 @@ export function useTransactions() {
   const error = ref(null);
 
   // Generate bank statement
-  const generateStatement = async (accountNumber, startDate, endDate) => {
+  const generateStatement = async (
+    accountNumber,
+    startDate,
+    endDate,
+    email = true
+  ) => {
     try {
       isLoading.value = true;
       error.value = null;
 
-      const response = await statementAPI.generateStatement(
+      // Ensure ISO date-time for backend expectations
+      const from = startDate; // "YYYY-MM-DD"
+      const to = endDate; // "YYYY-MM-DD"
+
+      // Request PDF (and optionally email via email=true)
+      const response = await statementAPI.generateStatementPdf(
         accountNumber,
-        startDate,
-        endDate
+        from,
+        to,
+        email
       );
 
-      transactions.value = response.data;
-      return { success: true, data: response.data };
+      // Download PDF blob
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `statement_${accountNumber}_${startDate}_${endDate}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      // Keep transactions state untouched; this call just triggers generation/download
+      return { success: true };
     } catch (err) {
       error.value =
         err.response?.data?.message ||
@@ -37,19 +59,29 @@ export function useTransactions() {
       isLoading.value = true;
       error.value = null;
 
-      // Get last 30 days transactions
-      const endDate = new Date().toISOString().split("T")[0];
-      const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+      // Last 30 days
+      const endDateOnly = new Date().toISOString().split("T")[0];
+      const startDateOnly = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
         .toISOString()
         .split("T")[0];
 
-      const response = await statementAPI.recentTransactions(
+      const from = startDateOnly; // no time part
+      const to = endDateOnly; // no time part
+
+      const response = await transactionAPI.list(
         accountNumber,
-        startDate,
-        endDate
+        from,
+        to,
+        0,
+        10
       );
 
-      return { success: true, data: response.data };
+      // Page<LedgerEntry> expected. Prefer content if present.
+      const data = response?.data;
+      const items = Array.isArray(data) ? data : data?.content || [];
+      transactions.value = items;
+
+      return { success: true, data: items };
     } catch (err) {
       error.value =
         err.response?.data?.message ||

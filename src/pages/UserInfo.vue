@@ -3,8 +3,12 @@
     <div class="max-w-4xl mx-auto space-y-6">
       <!-- Header -->
       <div class="text-center">
-        <h1 class="text-3xl font-bold text-gray-900">Profile Information</h1>
-        <p class="mt-2 text-gray-600">Manage your account details</p>
+        <h1 class="text-3xl font-bold text-gray-900">
+          {{ $t("profile.profileInformation") }}
+        </h1>
+        <p class="mt-2 text-gray-600">
+          {{ $t("profile.manageAccountDetails") }}
+        </p>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -29,7 +33,9 @@
               <div
                 class="flex justify-between items-center py-2 border-b border-gray-200"
               >
-                <span class="text-sm text-gray-600">Account Number</span>
+                <span class="text-sm text-gray-600">{{
+                  $t("forms.accountNumber")
+                }}</span>
                 <span class="font-medium">{{
                   user?.accountNumber || "N/A"
                 }}</span>
@@ -37,15 +43,19 @@
               <div
                 class="flex justify-between items-center py-2 border-b border-gray-200"
               >
-                <span class="text-sm text-gray-600">Status</span>
+                <span class="text-sm text-gray-600">{{
+                  $t("messages.status")
+                }}</span>
                 <span
                   class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800"
                 >
-                  {{ user?.status || "Active" }}
+                  {{ user?.status || $t("messages.active") }}
                 </span>
               </div>
               <div class="flex justify-between items-center py-2">
-                <span class="text-sm text-gray-600">Member Since</span>
+                <span class="text-sm text-gray-600">{{
+                  $t("profile.memberSince")
+                }}</span>
                 <span class="font-medium">{{
                   formatDate(user?.createdAt)
                 }}</span>
@@ -59,14 +69,14 @@
           <div class="card">
             <div class="flex items-center justify-between mb-6">
               <h2 class="text-xl font-semibold text-gray-900">
-                Personal Information
+                {{ $t("profile.personalInformation") }}
               </h2>
               <button
                 v-if="!isEditing"
                 @click="startEditing"
                 class="btn-primary"
               >
-                Edit Profile
+                {{ $t("profile.editProfile") }}
               </button>
             </div>
 
@@ -77,7 +87,9 @@
             >
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label for="firstName" class="form-label">First Name</label>
+                  <label for="firstName" class="form-label">{{
+                    $t("auth.firstName")
+                  }}</label>
                   <input
                     id="firstName"
                     v-model="editForm.firstName"
@@ -87,7 +99,9 @@
                   />
                 </div>
                 <div>
-                  <label for="lastName" class="form-label">Last Name</label>
+                  <label for="lastName" class="form-label">{{
+                    $t("auth.lastName")
+                  }}</label>
                   <input
                     id="lastName"
                     v-model="editForm.lastName"
@@ -99,7 +113,21 @@
               </div>
 
               <div>
-                <label for="email" class="form-label">Email Address</label>
+                <label for="otherName" class="form-label">{{
+                  $t("auth.otherName")
+                }}</label>
+                <input
+                  id="otherName"
+                  v-model="editForm.otherName"
+                  type="text"
+                  class="input-field"
+                />
+              </div>
+
+              <div>
+                <label for="email" class="form-label">{{
+                  $t("auth.emailAddress")
+                }}</label>
                 <input
                   id="email"
                   v-model="editForm.email"
@@ -110,7 +138,9 @@
               </div>
 
               <div>
-                <label for="phoneNumber" class="form-label">Phone Number</label>
+                <label for="phoneNumber" class="form-label">{{
+                  $t("auth.phoneNumber")
+                }}</label>
                 <input
                   id="phoneNumber"
                   v-model="editForm.phoneNumber"
@@ -121,7 +151,9 @@
               </div>
 
               <div>
-                <label for="address" class="form-label">Address</label>
+                <label for="address" class="form-label">{{
+                  $t("auth.address")
+                }}</label>
                 <textarea
                   id="address"
                   v-model="editForm.address"
@@ -132,9 +164,9 @@
               </div>
 
               <div>
-                <label for="alternativePhoneNumber" class="form-label"
-                  >Alternative Phone Number</label
-                >
+                <label for="alternativePhoneNumber" class="form-label">{{
+                  $t("forms.alternativePhoneNumber")
+                }}</label>
                 <input
                   id="alternativePhoneNumber"
                   v-model="editForm.alternativePhoneNumber"
@@ -179,16 +211,16 @@
                     <div
                       class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"
                     ></div>
-                    Updating...
+                    {{ $t("profile.updating") }}
                   </span>
-                  <span v-else>Save Changes</span>
+                  <span v-else>{{ $t("profile.saveChanges") }}</span>
                 </button>
                 <button
                   type="button"
                   @click="cancelEditing"
                   class="btn-secondary flex-1"
                 >
-                  Cancel
+                  {{ $t("buttons.cancel") }}
                 </button>
               </div>
             </form>
@@ -197,13 +229,13 @@
             <div v-else class="space-y-6">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label class="form-label">First Name</label>
+                  <label class="form-label">{{ $t("auth.firstName") }}</label>
                   <p class="text-gray-900 font-medium">
                     {{ user?.firstName || "N/A" }}
                   </p>
                 </div>
                 <div>
-                  <label class="form-label">Last Name</label>
+                  <label class="form-label">{{ $t("auth.lastName") }}</label>
                   <p class="text-gray-900 font-medium">
                     {{ user?.lastName || "N/A" }}
                   </p>
@@ -211,37 +243,41 @@
               </div>
 
               <div>
-                <label class="form-label">Email Address</label>
+                <label class="form-label">{{ $t("auth.emailAddress") }}</label>
                 <p class="text-gray-900 font-medium">
                   {{ user?.email || "N/A" }}
                 </p>
               </div>
 
               <div>
-                <label class="form-label">Phone Number</label>
+                <label class="form-label">{{ $t("auth.phoneNumber") }}</label>
                 <p class="text-gray-900 font-medium">
                   {{ user?.phoneNumber || "N/A" }}
                 </p>
               </div>
 
               <div>
-                <label class="form-label">Address</label>
+                <label class="form-label">{{ $t("auth.address") }}</label>
                 <p class="text-gray-900 font-medium">
                   {{ user?.address || "N/A" }}
                 </p>
               </div>
 
               <div>
-                <label class="form-label">Alternative Phone Number</label>
+                <label class="form-label">{{
+                  $t("forms.alternativePhoneNumber")
+                }}</label>
                 <p class="text-gray-900 font-medium">
-                  {{ user?.alternativePhoneNumber || "Not provided" }}
+                  {{
+                    user?.alternativePhoneNumber || $t("messages.notProvided")
+                  }}
                 </p>
               </div>
 
               <div>
-                <label class="form-label">Gender</label>
+                <label class="form-label">{{ $t("messages.gender") }}</label>
                 <p class="text-gray-900 font-medium">
-                  {{ user?.gender || "Not specified" }}
+                  {{ user?.gender || $t("messages.notSpecified") }}
                 </p>
               </div>
             </div>
@@ -252,7 +288,7 @@
       <!-- Account Actions -->
       <div class="card">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">
-          Account Actions
+          {{ $t("profile.accountActions") }}
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <router-link
@@ -275,9 +311,11 @@
               </svg>
             </div>
             <div class="ml-4">
-              <h4 class="font-medium text-gray-900">Check Balance</h4>
+              <h4 class="font-medium text-gray-900">
+                {{ $t("profile.checkBalance") }}
+              </h4>
               <p class="text-sm text-gray-600">
-                View your current account balance
+                {{ $t("profile.viewCurrentBalance") }}
               </p>
             </div>
           </router-link>
@@ -302,9 +340,11 @@
               </svg>
             </div>
             <div class="ml-4">
-              <h4 class="font-medium text-gray-900">Download Statement</h4>
+              <h4 class="font-medium text-gray-900">
+                {{ $t("profile.downloadStatement") }}
+              </h4>
               <p class="text-sm text-gray-600">
-                Get your account statement via email
+                {{ $t("profile.getAccountStatement") }}
               </p>
             </div>
           </router-link>
@@ -329,8 +369,12 @@
               </svg>
             </div>
             <div class="ml-4">
-              <h4 class="font-medium text-gray-900">Transfer Money</h4>
-              <p class="text-sm text-gray-600">Send money to other accounts</p>
+              <h4 class="font-medium text-gray-900">
+                {{ $t("profile.transferMoney") }}
+              </h4>
+              <p class="text-sm text-gray-600">
+                {{ $t("profile.sendMoneyToAccounts") }}
+              </p>
             </div>
           </router-link>
         </div>
@@ -359,7 +403,7 @@
           </div>
           <div class="ml-3">
             <p class="text-sm font-medium text-green-800">
-              Profile updated successfully!
+              {{ $t("profile.profileUpdatedSuccessfully") }}
             </p>
           </div>
         </div>
@@ -370,10 +414,13 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 import Layout from "@/components/layout/Layout.vue";
 import { useAuth } from "@/composables/useAuth";
+import { profileAPI } from "@/services/api";
 
 const { user } = useAuth();
+const { t } = useI18n();
 
 const isEditing = ref(false);
 const isUpdating = ref(false);
@@ -383,6 +430,7 @@ const updateSuccess = ref(false);
 const editForm = reactive({
   firstName: "",
   lastName: "",
+  otherName: "",
   email: "",
   phoneNumber: "",
   address: "",
@@ -393,7 +441,7 @@ const fullName = computed(() => {
   if (user.value?.firstName && user.value?.lastName) {
     return `${user.value.firstName} ${user.value.lastName}`;
   }
-  return user.value?.name || "User";
+  return user.value?.name || t("messages.user");
 });
 
 const userInitials = computed(() => {
@@ -409,6 +457,7 @@ const startEditing = () => {
   // Populate form with current user data
   editForm.firstName = user.value?.firstName || "";
   editForm.lastName = user.value?.lastName || "";
+  editForm.otherName = user.value?.otherName || "";
   editForm.email = user.value?.email || "";
   editForm.phoneNumber = user.value?.phoneNumber || "";
   editForm.address = user.value?.address || "";
@@ -429,14 +478,28 @@ const handleUpdateProfile = async () => {
     isUpdating.value = true;
     updateError.value = null;
 
-    // Here you would call your API to update the profile
-    // const result = await updateProfile(editForm)
+    // Call PROFILE-SERVICE to update current user's profile
+    const response = await profileAPI.updateMe({
+      firstName: editForm.firstName,
+      lastName: editForm.lastName,
+      otherName: editForm.otherName || "",
+      address: editForm.address,
+      phoneNumber: editForm.phoneNumber,
+      alternativePhoneNumber: editForm.alternativePhoneNumber || "",
+      // gender/stateOfOrigin can be added here when UI supports them
+    });
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Success returns ProfileResponse body
+    const updated = response.data;
+    if (!updated) {
+      throw new Error("Empty profile response");
+    }
 
-    // Update local user data (in a real app, this would come from the API response)
-    Object.assign(user.value, editForm);
+    // Update local user data with server response
+    user.value = updated;
+
+    // Persist locally
+    localStorage.setItem("user", JSON.stringify(user.value));
 
     isEditing.value = false;
     updateSuccess.value = true;
@@ -446,7 +509,11 @@ const handleUpdateProfile = async () => {
       updateSuccess.value = false;
     }, 3000);
   } catch (error) {
-    updateError.value = error.message || "Failed to update profile";
+    updateError.value =
+      error?.response?.data?.responseMessage ||
+      error?.response?.data?.message ||
+      error?.message ||
+      t("messages.failedToUpdateProfile");
   } finally {
     isUpdating.value = false;
   }

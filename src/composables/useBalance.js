@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import { userAPI } from "@/services/api";
+import { accountAPI } from "@/services/api";
 
 export function useBalance() {
   const balance = ref(null);
@@ -12,14 +12,16 @@ export function useBalance() {
       isLoading.value = true;
       error.value = null;
 
-      const response = await userAPI.balanceEnquiry({ accountNumber });
+      // GET /api/accounts/{accountNumber}/balance -> BankResponse
+      const response = await accountAPI.balanceEnquiry(accountNumber);
 
-      if (response.data.responseCode === "004") {
-        balance.value = response.data.accountInfo;
+      if (response?.data?.responseCode === "005") {
+        // BankResponse.accountInfo contains { accountNumber, accountName, accountBalance }
+        balance.value = response.data.accountInfo || null;
         return { success: true, data: response.data };
       } else {
         throw new Error(
-          response.data.responseMessage || "Failed to get balance"
+          response?.data?.responseMessage || "Failed to get balance"
         );
       }
     } catch (err) {
@@ -39,7 +41,8 @@ export function useBalance() {
       isLoading.value = true;
       error.value = null;
 
-      const response = await userAPI.nameEnquiry({ accountNumber });
+      // GET /api/accounts/{accountNumber}/name -> string
+      const response = await accountAPI.nameEnquiry(accountNumber);
 
       return { success: true, data: response.data };
     } catch (err) {
