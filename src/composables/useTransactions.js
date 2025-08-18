@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import { statementAPI, transactionAPI } from "@/services/api";
+import { statementAPI } from "@/services/api";
 
 export function useTransactions() {
   const transactions = ref([]);
@@ -68,12 +68,10 @@ export function useTransactions() {
       const from = startDateOnly; // no time part
       const to = endDateOnly; // no time part
 
-      const response = await transactionAPI.list(
+      const response = await statementAPI.recentTransactions(
         accountNumber,
         from,
-        to,
-        0,
-        10
+        to
       );
 
       // Page<LedgerEntry> expected. Prefer content if present.

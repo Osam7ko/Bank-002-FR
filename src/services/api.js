@@ -1,10 +1,5 @@
 import axios from "axios";
-import {
-  getAccessToken,
-  getRefreshToken,
-  isTokenExpiringSoon,
-  refreshWithLock,
-} from "@/services/auth/authService";
+import { getAccessToken } from "@/services/auth/authService";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:9000";
@@ -27,17 +22,12 @@ api.interceptors.request.use(
   async (config) => {
     const url = config.url || "";
 
-    // Never attach Authorization for /auth/** endpoints
-    if (!url.startsWith("/auth/") && needsAuthHeader(url)) {
-      try {
-        // Proactive refresh if token is expiring soon
-        if (getRefreshToken() && isTokenExpiringSoon(30)) {
-          await refreshWithLock();
-        }
-      } catch {
-        // If refresh fails here, proceed without changing request; backend will 401 and response interceptor will handle logout
-      }
-
+    // Attach Authorization for protected endpoints only (skip public user register/login)
+    if (
+      needsAuthHeader(url) &&
+      !url.startsWith("/api/auth/register") &&
+      !url.startsWith("/api/auth/login")
+    ) {
       const at = getAccessToken();
       if (at) {
         config.headers = config.headers || {};
@@ -54,34 +44,6 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (res) => res,
   async (err) => {
-    const original = err.config || {};
-    const status = err.response?.status;
-    const url = original.url || "";
-
-    // Only handle 401 from protected resources, avoid /auth/**
-    const eligible =
-      status === 401 &&
-      !original._retry &&
-      !url.startsWith("/auth/") &&
-      needsAuthHeader(url);
-
-    if (eligible) {
-      try {
-        if (getRefreshToken()) {
-          await refreshWithLock();
-          const newAccess = getAccessToken();
-          if (newAccess) {
-            original.headers = original.headers || {};
-            original.headers.Authorization = `Bearer ${newAccess}`;
-          }
-          original._retry = true;
-          return api.request(original);
-        }
-      } catch {
-        // fall through to reject
-      }
-    }
-
     return Promise.reject(err);
   }
 );
@@ -109,15 +71,9 @@ export const accountAPI = {
   nameEnquiry: (accountNumber) =>
     api.get(`/api/accounts/${encodeURIComponent(accountNumber)}/name`),
   credit: (accountNumber, amount) =>
-    api.post(
-      `/api/accounts/${encodeURIComponent(accountNumber)}/credit`,
-      null,
-      { params: { amount } }
-    ),
+    api.post("/api/accounts/credit", { accountNumber, amount }),
   debit: (accountNumber, amount) =>
-    api.post(`/api/accounts/${encodeURIComponent(accountNumber)}/debit`, null, {
-      params: { amount },
-    }),
+    api.post("/api/accounts/debit", { accountNumber, amount }),
   countByOwner: (profileId) =>
     api.get(`/api/accounts/owner/${encodeURIComponent(profileId)}/count`),
   listByOwner: (profileId) =>
@@ -131,16 +87,20 @@ export const accountAPI = {
 
 // Transfer Service
 export const transferAPI = {
-  transfer: (transferRequest, idempotencyKey) =>
-    api.post("/api/transfers", transferRequest, {
-      headers: idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {},
-    }),
+  transfer: (transferRequest) => api.post("/api/transfers", transferRequest),
 };
 
 // Card Service
 export const cardAPI = {
-  issue: (issueCardRequest) => api.post("/api/cards", issueCardRequest),
-  list: (accountNumber) => api.get("/api/cards", { params: { accountNumber } }),
+  // New order-based flow
+  products: () => api.get("/api/cards/products"),
+  createOrder: (payload) => api.post("/api/cards/orders", payload),
+  getOrder: (orderId) =>
+    api.get(`/api/cards/orders/${encodeURIComponent(orderId)}`),
+
+  // Existing
+  list: (accountNumber) =>
+    api.get(`/api/cards/${encodeURIComponent(accountNumber)}`),
   updateStatus: (cardId, status) =>
     api.patch(`/api/cards/${encodeURIComponent(cardId)}/status`, { status }),
   verify: (verifyCardRequest) =>
@@ -159,12 +119,12 @@ export const transactionAPI = {
 export const statementAPI = {
   generateStatementPdf: (accountNumber, from, to, email = false) =>
     api.get("/api/statements/pdf", {
-      params: { accountNumber, from, to, email },
+      params: { accountNumber, startDate: from, endDate: to, email },
       responseType: "blob",
     }),
-  recentTransactions: (accountNumber, from, to, page = 0, size = 10) =>
-    api.get("/api/transactions", {
-      params: { accountNumber, from, to, page, size },
+  recentTransactions: (accountNumber, from, to) =>
+    api.get("/api/statements/recent", {
+      params: { accountNumber, startDate: from, endDate: to },
     }),
 };
 
@@ -173,9 +133,7 @@ export const beneficiaryAPI_v2 = {
   save: (dto) => api.post("/api/beneficiaries", dto),
   getAll: () => api.get("/api/beneficiaries"),
   deleteByAccountNumber: (accountNumber) =>
-    api.delete(
-      `/api/beneficiaries/by-account/${encodeURIComponent(accountNumber)}`
-    ),
+    api.delete(`/api/beneficiaries/${encodeURIComponent(accountNumber)}`),
 };
 
 export default api;

@@ -226,5 +226,49 @@
     "language": "Language",
     "english": "English",
     "arabic": "العربية"
+  },
+  "cardCatalog": {
+    "title": "Choose a Card",
+    "subtitle": "Pick a card product that suits you best.",
+    "backToCards": "Back to My Cards",
+    "product": "Product",
+    "network": "Network",
+    "benefits": "Benefits",
+    "select": "Select",
+    "noProducts": "No card products available at the moment."
+  },
+  "cardOrder": {
+    "title": "Card Terms & Confirmation",
+    "subtitle": "Confirm your selection and accept Terms & Conditions to proceed.",
+    "selectedProductCode": "Selected Product Code",
+    "accountNumber": "Account Number",
+    "nameOnCardOptional": "Name on Card (optional)",
+    "termsHeader": "Terms & Conditions",
+    "termsBody": "By placing this order, you acknowledge and accept the Cardholder Terms & Conditions, including applicable fees and usage guidelines provided by the bank.",
+    "acceptTerms": "I accept the Terms & Conditions",
+    "errorAccept": "Please accept Terms & Conditions",
+    "errorMissingData": "Missing productCode or accountNumber",
+    "backToCatalog": "Back to Catalog",
+    "cancel": "Cancel",
+    "placeOrder": "Place Order",
+    "submitting": "Submitting...",
+    "defaultAccountHint": "Use your default account number if not sure.",
+    "noProductSelected": "No product selected. Go back to catalog."
+  },
+  "cardProgress": {
+    "processingTitle": "Processing your card…",
+    "processingSubtitle": "We are issuing your new card. This usually takes around {eta} seconds.",
+    "orderId": "Order ID",
+    "status": "Status",
+    "etaLabel": "Estimated time remaining",
+    "rejected": "Order was rejected",
+    "completedHeader": "Card Issued 🎉",
+    "completedMessage": "Completed",
+    "type": "Type",
+    "maskedNumber": "Masked Number",
+    "expiry": "Expiry",
+    "account": "Account",
+    "viewMyCards": "View my cards",
+    "backToCatalog": "Back to Catalog"
   }
 }

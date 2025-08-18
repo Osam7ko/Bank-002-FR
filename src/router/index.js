@@ -78,6 +78,31 @@ const routes = [
     component: UserInfo,
     meta: { requiresAuth: true },
   },
+  // New card order flow routes
+  {
+    path: "/cards/catalog",
+    name: "CardCatalog",
+    component: () => import("@/pages/cards/Catalog.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/cards/order",
+    name: "CardOrder",
+    component: () => import("@/pages/cards/Order.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/cards/progress/:orderId",
+    name: "CardOrderProgress",
+    component: () => import("@/pages/cards/Progress.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/cards/:accountNumber",
+    name: "CardsList",
+    component: Cards,
+    meta: { requiresAuth: true },
+  },
   {
     path: "/:pathMatch(.*)*",
     redirect: "/dashboard",
@@ -94,46 +119,21 @@ const router = createRouter({
  * - Require valid JWT for protected routes; try refresh once if expiring/expired.
  * - Redirect authenticated users away from guest-only routes.
  */
-router.beforeEach(async (to, from, next) => {
+router.beforeEach((to, from, next) => {
   const requiresAuth = !!to.meta.requiresAuth;
   const requiresGuest = !!to.meta.requiresGuest;
 
   const access = authService.getAccessToken();
-  const refresh = authService.getRefreshToken();
   const tokenValid = !!access && !authService.isTokenExpired(5); // small buffer
 
-  if (requiresAuth) {
-    if (tokenValid) {
-      next();
-      return;
-    }
-    if (refresh) {
-      try {
-        await authService.refreshWithLock();
-        next();
-        return;
-      } catch {
-        // fall through to login
-      }
-    }
+  if (requiresAuth && !tokenValid) {
     next("/login");
     return;
   }
 
-  if (requiresGuest) {
-    if (tokenValid) {
-      next("/dashboard");
-      return;
-    }
-    if (refresh) {
-      try {
-        await authService.refreshWithLock();
-        next("/dashboard");
-        return;
-      } catch {
-        // allow guest route
-      }
-    }
+  if (requiresGuest && tokenValid) {
+    next("/dashboard");
+    return;
   }
 
   next();

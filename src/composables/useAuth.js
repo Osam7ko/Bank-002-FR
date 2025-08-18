@@ -1,6 +1,5 @@
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
-import { profileAPI, accountAPI } from "@/services/api";
 import authService from "@/services/auth/authService";
 
 const user = ref(null);
@@ -17,26 +16,16 @@ export function useAuth() {
   });
   const currentUser = computed(() => user.value);
 
-  // Bootstrap profile after login
+  // Bootstrap profile from cached local storage (no server call)
   const bootstrapProfile = async () => {
-    const me = await profileAPI.me();
-    user.value = me.data || null;
-    try {
-      // pick ONE of the two calls below depending on which endpoint you added
-      const { data: accounts } = await accountAPI.listByOwner(user.value.id);
-      if (accounts?.length) {
-        user.value.accountNumber = accounts[0].accountNumber;
-        user.value.accountName = accounts[0].displayName; // optional
+    const cachedUser = localStorage.getItem("user");
+    if (cachedUser) {
+      try {
+        user.value = JSON.parse(cachedUser);
+      } catch {
+        user.value = null;
       }
-      // OR:
-      // const { data: acc } = await accountAPI.getDefaultByOwner(user.value.id);
-      // user.value.accountNumber = acc.accountNumber;
-      // user.value.accountName   = acc.displayName;
-    } catch (e) {
-      console.warn("No account yet for profile", e);
     }
-
-    localStorage.setItem("user", JSON.stringify(user.value));
   };
 
   // Initialize auth on app start
@@ -44,25 +33,19 @@ export function useAuth() {
     isLoading.value = true;
     try {
       const at = authService.getAccessToken();
-      const rt = authService.getRefreshToken();
 
-      if (at) {
-        if (authService.isTokenExpiringSoon(30) && rt) {
+      if (at && !authService.isTokenExpired(30)) {
+        // Restore cached user if present
+        const cachedUser = localStorage.getItem("user");
+        if (cachedUser) {
           try {
-            await authService.refreshWithLock();
-            console.log(
-              "AFTER REFRESH access=",
-              getAccessToken()?.slice(0, 20)
-            );
+            user.value = JSON.parse(cachedUser);
           } catch {
-            // refresh failed, force logout
-            await logout();
-            return;
+            user.value = null;
           }
         }
-        await bootstrapProfile();
       } else {
-        // Try restore cached user for UI purposes (non-authoritative)
+        // Not authenticated; keep any cached user for UI (non-authoritative)
         const cachedUser = localStorage.getItem("user");
         if (cachedUser) {
           try {
@@ -87,7 +70,13 @@ export function useAuth() {
     try {
       const res = await authService.login(credentials);
       if (res.status === 200) {
-        await bootstrapProfile();
+        const info = res?.data?.accountInfo || {};
+        user.value = {
+          email: credentials.email,
+          accountNumber: info.accountNumber || null,
+          accountName: info.accountName || null,
+        };
+        localStorage.setItem("user", JSON.stringify(user.value));
         router.replace("/dashboard");
         return { success: true };
       }
@@ -102,61 +91,25 @@ export function useAuth() {
     }
   };
 
-  // Register function: register -> login -> bootstrap -> update profile with form -> load me -> navigate
+  // Register function using new BK contract
   const register = async (payload) => {
     isLoading.value = true;
     error.value = null;
     try {
       const res = await authService.register(payload);
-      if (res.status === 201) {
+      if (res.status === 200 || res.status === 201) {
         // Login after successful registration
-        await authService.login({
+        const loginRes = await authService.login({
           email: payload.email,
           password: payload.password,
         });
-
-        // Ensure profile exists then fill it with registration form data
-        try {
-          await profileAPI.bootstrap();
-        } catch (_) {
-          // ignore; bootstrap is idempotent
-        }
-
-        await profileAPI.updateMe({
-          firstName: payload.firstName,
-          lastName: payload.lastName,
-          otherName: payload.otherName || null,
-          email: payload.email || null,
-          gender: payload.gender || null,
-          address: payload.address,
-          stateOfOrigin: payload.stateOfOrigin,
-          phoneNumber: payload.phoneNumber,
-          alternativePhoneNumber: payload.alternativePhoneNumber || null,
-        });
-
-        const me = await profileAPI.me();
-        user.value = me.data || null;
+        const info = loginRes?.data?.accountInfo || {};
+        user.value = {
+          email: payload.email,
+          accountNumber: info.accountNumber || null,
+          accountName: info.accountName || null,
+        };
         localStorage.setItem("user", JSON.stringify(user.value));
-
-        // Enrich with default account to avoid N/A on dashboard
-        try {
-          const acc = await accountAPI.getDefaultByOwner(String(user.value.id));
-          const accData = acc?.data || {};
-          user.value.accountNumber =
-            accData.accountNumber ??
-            accData?.accountInfo?.accountNumber ??
-            user.value.accountNumber;
-          user.value.accountName =
-            accData.displayName ??
-            accData.accountName ??
-            accData?.accountInfo?.accountName ??
-            user.value.accountName;
-          localStorage.setItem("user", JSON.stringify(user.value));
-        } catch (e2) {
-          console.warn("No default account yet for profile", e2);
-        }
-
-        // Navigate after successful bootstrap/fill
         router.replace("/dashboard");
         return { success: true };
       } else if (res.status === 409) {

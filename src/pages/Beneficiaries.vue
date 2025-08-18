@@ -257,7 +257,7 @@
         >
           <div
             v-for="beneficiary in beneficiaries"
-            :key="beneficiary.id"
+            :key="beneficiary.accountNumber"
             class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
           >
             <div class="flex items-start justify-between">
@@ -267,12 +267,12 @@
                     class="h-10 w-10 rounded-full bg-primary-600 flex items-center justify-center"
                   >
                     <span class="text-white font-medium">
-                      {{ getBeneficiaryInitials(beneficiary.beneficiaryName) }}
+                      {{ getBeneficiaryInitials(beneficiary.name) }}
                     </span>
                   </div>
                   <div class="ml-3">
                     <h3 class="text-lg font-medium text-gray-900">
-                      {{ beneficiary.beneficiaryName }}
+                      {{ beneficiary.name }}
                     </h3>
                     <p class="text-sm text-gray-500">
                       {{ beneficiary.accountNumber }}
@@ -283,7 +283,10 @@
                   <router-link
                     :to="{
                       name: 'Transfer',
-                      query: { beneficiary: beneficiary.id },
+                      query: {
+                        accountNumber: beneficiary.accountNumber,
+                        name: beneficiary.name,
+                      },
                     }"
                     class="btn-primary text-sm"
                   >
@@ -407,9 +410,8 @@ const handleAddBeneficiary = async () => {
     };
 
     await beneficiaryAPI_v2.save({
-      beneficiaryName: beneficiaryData.beneficiaryName,
+      name: beneficiaryData.beneficiaryName,
       accountNumber: beneficiaryData.accountNumber,
-      bankName: "001 Bank",
     });
 
     successMessage.value = t("messages.beneficiarySavedSuccessfully");
@@ -458,9 +460,9 @@ const cancelAdd = () => {
   verifiedAccountName.value = null;
 };
 
-const getBeneficiaryInitials = (nickname) => {
-  if (!nickname) return "?";
-  return nickname
+const getBeneficiaryInitials = (displayName) => {
+  if (!displayName) return "?";
+  return displayName
     .split(" ")
     .map((n) => n[0])
     .join("")

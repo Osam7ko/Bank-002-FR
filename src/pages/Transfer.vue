@@ -210,14 +210,14 @@
             <div v-else class="space-y-2">
               <div
                 v-for="beneficiary in beneficiaries"
-                :key="beneficiary.id"
+                :key="beneficiary.accountNumber"
                 class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
                 @click="selectBeneficiary(beneficiary)"
               >
                 <div class="flex items-center justify-between">
                   <div>
                     <p class="text-sm font-medium text-gray-900">
-                      {{ beneficiary.beneficiaryName }}
+                      {{ beneficiary.name }}
                     </p>
                     <p class="text-xs text-gray-500">
                       {{ beneficiary.accountNumber }}
@@ -337,8 +337,8 @@ const handleTransfer = async () => {
   clearError();
 
   const result = await transfer({
-    fromAccount: form.sourceAccountNumber,
-    toAccount: form.destinationAccountNumber,
+    sourceAccountNumber: form.sourceAccountNumber,
+    destinationAccountNumber: form.destinationAccountNumber,
     amount: parseFloat(form.amount),
     description: form.description,
   });
@@ -364,7 +364,7 @@ const checkAccountName = async () => {
 
 const selectBeneficiary = (beneficiary) => {
   form.destinationAccountNumber = beneficiary.accountNumber;
-  accountName.value = beneficiary.beneficiaryName;
+  accountName.value = beneficiary.name;
   showBeneficiaries.value = false;
 };
 
