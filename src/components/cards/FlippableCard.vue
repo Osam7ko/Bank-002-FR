@@ -13,8 +13,12 @@
         class="absolute inset-0 rounded-xl p-4 bg-gradient-to-br from-primary-600 to-primary-700 text-white [backface-visibility:hidden]"
       >
         <div class="flex justify-between items-start">
-          <div class="h-6 opacity-90 font-semibold tracking-wide">
-            NATIONAL BANK
+          <div class="h-8 opacity-90 font-semibold tracking-wide">
+            <img
+              src="/002bank_logo.png"
+              alt="Bank 002 Logo"
+              class="h-16 w-16 mr-2"
+            />
           </div>
           <span class="text-xs bg-white/15 px-2 py-0.5 rounded">{{
             card.cardType

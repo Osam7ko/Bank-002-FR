@@ -2,10 +2,13 @@
   <nav class="bg-white shadow-lg border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16">
-        <!-- Logo and Brand -->
         <div class="flex items-center">
           <div class="flex-shrink-0 flex items-center">
-            <h1 class="text-2xl font-bold text-primary-600">BankApp 002</h1>
+            <img
+              src="/002bank_logo.png"
+              alt="Bank 002 Logo"
+              class="h-16 w-16 mr-2"
+            />
           </div>
         </div>
 
